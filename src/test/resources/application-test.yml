@@ -1,6 +1,6 @@
 logging:
   level:
-    root: DEBUG
+    root: INFO
 
 ## Topics and consumer groups
 topics:
@@ -14,7 +14,7 @@ topics:
     group: rtd-pim-consumer-group
 
 # custom integration flow properties
-integration-flow:
+integration-flow-consumers:
   tkmBulkConsumer:
     topic: ${topics.tkm-write-update.topic}
     bootstrap.servers: ${KAFKA_BROKER_TKM:localhost:29095}
@@ -27,7 +27,7 @@ integration-flow:
 spring:
   config:
     activate:
-      on-profile: default
+      on-profile: test
 
   cloud:
     stream:

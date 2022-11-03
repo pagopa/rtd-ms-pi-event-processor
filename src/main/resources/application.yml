@@ -14,7 +14,7 @@ topics:
     group: rtd-pim-consumer-group
 
 # custom integration flow properties
-integration-flow:
+integration-flow-consumers:
   tkmBulkConsumer:
     topic: ${topics.tkm-write-update.topic}
     bootstrap.servers: ${KAFKA_BROKER_TKM:localhost:29095}
