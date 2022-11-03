@@ -17,7 +17,7 @@ topics:
 integration-flow-consumers:
   tkmBulkConsumer:
     topic: ${topics.tkm-write-update.topic}
-    bootstrap.servers: ${KAFKA_BROKER_TKM:localhost:29095}
+    bootstrap.servers: ${spring.embedded.kafka.brokers}
     group.id: ${topics.tkm-write-update.group}
     key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
     value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -41,7 +41,7 @@ spring:
             partitionCount: ${KAFKA_PARTITION_COUNT:1}
             sync: true
 
-      binder:
+      binders:
         kafka-binder:
           type: kafka
           environment.spring.cloud.stream.kafka:
@@ -49,6 +49,7 @@ spring:
               auto-create-topics: false
               brokers: ${spring.embedded.kafka.brokers}
               requiredAcks: all
+              sync: true
               consumerProperties:
                 key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
                 value.deserializer: org.apache.kafka.common.serialization.StringDeserializer

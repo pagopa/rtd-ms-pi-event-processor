@@ -1,8 +1,10 @@
 package it.gov.pagopa.rtd.ms.pieventprocessor.configuration;
 
 import it.gov.pagopa.rtd.ms.pieventprocessor.configuration.properties.IntegrationFlowKafkaProperties;
+import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.TkmSplitterFlow;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.TokenManagerCardChanged;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.TokenManagerWalletChanged;
+import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.splitter.TokenManagerCardEventHandler;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.splitter.TokenManagerCardEventPublisher;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.splitter.TokenManagerWalletEventSplitter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -11,9 +13,6 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.handler.GenericHandler;
-import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.integration.handler.advice.RequestHandlerRetryAdvice;
 import org.springframework.integration.handler.advice.RetryStateGenerator;
 import org.springframework.integration.handler.advice.SpelExpressionRetryStateGenerator;
@@ -41,14 +40,9 @@ public class TkmIntegrationFlowConfig {
             KafkaMessageDrivenChannelAdapter<String, TokenManagerWalletChanged> tkmBulkInput,
             Function<TokenManagerWalletChanged, List<TokenManagerCardChanged>> tkmSplitter,
             RequestHandlerRetryAdvice tkmRetryAdvice,
-            GenericHandler<TokenManagerCardChanged> cardEventPublisher
+            TokenManagerCardEventHandler cardEventHandler
     ) {
-        return IntegrationFlows.from(tkmBulkInput)
-                .log(LoggingHandler.Level.INFO, m -> "Received message to split: " + m.getPayload())
-                .split(TokenManagerWalletChanged.class, tkmSplitter)
-                .log(LoggingHandler.Level.INFO, m -> "Split message " + m.getPayload())
-                .handle(TokenManagerCardChanged.class, cardEventPublisher, e -> e.advice(tkmRetryAdvice))
-                .get();
+        return TkmSplitterFlow.createFlow(tkmBulkInput, tkmSplitter, tkmRetryAdvice, cardEventHandler);
     }
 
     @Bean
@@ -57,8 +51,13 @@ public class TkmIntegrationFlowConfig {
     }
 
     @Bean
-    GenericHandler<TokenManagerCardChanged> cardEventPublisher(StreamBridge bridge) {
-        return TokenManagerCardEventPublisher.asHandler(TARGET_OUT_BINDING, bridge);
+    TokenManagerCardEventHandler cardEventHandler(TokenManagerCardEventPublisher cardEventPublisher) {
+        return new TokenManagerCardEventHandler(cardEventPublisher);
+    }
+
+    @Bean
+    TokenManagerCardEventPublisher cardEventPublisher(StreamBridge bridge) {
+        return new TokenManagerCardEventPublisher(TARGET_OUT_BINDING, bridge);
     }
 
     @Bean

@@ -25,17 +25,7 @@ public final class TokenManagerWalletChanged {
   private LocalDateTime timestamp;
   private List<CardItem> cards;
 
-  @Data
-  public static final class CardItem {
-    private final String hpan;
-    private final String par;
-    private final CardChangeType action;
-    private final List<HashTokenItem> htokens;
-  }
+  public record CardItem(String hpan, String par, CardChangeType action, List<HashTokenItem> htokens) {}
 
-  @Data
-  public static final class HashTokenItem {
-    private final String htoken;
-    private final HashTokenChangeType haction;
-  }
+  public record HashTokenItem(String htoken, HashTokenChangeType haction) { }
 }

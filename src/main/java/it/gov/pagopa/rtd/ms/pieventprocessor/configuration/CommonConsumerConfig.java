@@ -1,5 +1,6 @@
 package it.gov.pagopa.rtd.ms.pieventprocessor.configuration;
 
+import it.gov.pagopa.rtd.ms.pieventprocessor.common.errors.FailToPublishException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.listener.DefaultErrorHandler;
@@ -29,7 +30,8 @@ public class CommonConsumerConfig {
                 SocketTimeoutException.class,
                 ConnectException.class,
                 UnknownHostException.class,
-                IOException.class
+                IOException.class,
+                FailToPublishException.class
         );
     }
 

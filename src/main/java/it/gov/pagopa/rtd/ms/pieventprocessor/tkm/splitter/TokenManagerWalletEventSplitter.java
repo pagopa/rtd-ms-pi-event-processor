@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public final class TokenManagerWalletEventSplitter implements Function<TokenManagerWalletChanged, List<TokenManagerCardChanged>> {
 
@@ -17,22 +16,22 @@ public final class TokenManagerWalletEventSplitter implements Function<TokenMana
             .orElse(Collections.emptyList())
             .stream()
             .map(it -> TokenManagerCardChanged.builder()
-                    .hashPan(it.getHpan())
-                    .par(it.getPar())
-                    .changeType(it.getAction())
+                    .hashPan(it.hpan())
+                    .par(it.par())
+                    .changeType(it.action())
                     .taxCode(tokenManagerWalletChanged.getTaxCode())
                     .hashTokens(buildHashTokenEvents(it))
                     .timestamp(tokenManagerWalletChanged.getTimestamp())
                     .build()
             )
-            .collect(Collectors.toList());
+            .toList();
   }
 
   private List<TokenManagerCardChanged.HashTokenEvent> buildHashTokenEvents(TokenManagerWalletChanged.CardItem card) {
-    return Optional.ofNullable(card.getHtokens())
+    return Optional.ofNullable(card.htokens())
             .orElse(Collections.emptyList())
             .stream()
-            .map(token -> new TokenManagerCardChanged.HashTokenEvent(token.getHtoken(), token.getHaction()))
-            .collect(Collectors.toList());
+            .map(token -> new TokenManagerCardChanged.HashTokenEvent(token.htoken(), token.haction()))
+            .toList();
   }
 }
