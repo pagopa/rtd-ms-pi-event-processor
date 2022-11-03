@@ -1,0 +1,56 @@
+logging:
+  level:
+    root: DEBUG
+
+## Topics and consumer groups
+topics:
+  rtd-slit-by-pi:
+    topic: rtd-split-by-pi
+  rtd-pi-from-app:
+    topic: rtd-pi-from-app
+    group: rtd-enrolled-payment-instrument-consumer-group
+  tkm-write-update:
+    topic: tkm-write-update-token
+    group: rtd-pim-consumer-group
+
+# custom integration flow properties
+integration-flow:
+  tkmBulkConsumer:
+    topic: ${topics.tkm-write-update.topic}
+    bootstrap.servers: ${KAFKA_BROKER_TKM:localhost:29095}
+    group.id: ${topics.tkm-write-update.group}
+    key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    allow.auto.create.topics: false
+    max.poll.records: 1
+
+spring:
+  config:
+    activate:
+      on-profile: default
+
+  cloud:
+    stream:
+      bindings:
+        rtdSplitByPi-out-0:
+          destination: ${topics.rtd-slit-by-pi.topic}
+          content-type: application/json
+          binder: kafka-binder
+          producer:
+            partitionKeyExpression: headers.partitionKey
+            partitionCount: ${KAFKA_PARTITION_COUNT:1}
+            sync: true
+
+      binder:
+        kafka-binder:
+          type: kafka
+          environment.spring.cloud.stream.kafka:
+            binder:
+              auto-create-topics: false
+              brokers: ${spring.embedded.kafka.brokers}
+              requiredAcks: all
+              consumerProperties:
+                key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+                value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+
