@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.UnknownFormatConversionException;
 
 @Configuration
-public class CommonConsumerConfig {
+public class CommonConsumerConfiguration {
 
     private static final Long FIXED_RETRY_BACKOFF_INTERVAL = 3000L;
 

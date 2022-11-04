@@ -2,7 +2,7 @@ package it.gov.pagopa.rtd.ms.pieventprocessor.tkm.splitter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.rtd.ms.pieventprocessor.TestUtils;
-import it.gov.pagopa.rtd.ms.pieventprocessor.configuration.CommonConsumerConfig;
+import it.gov.pagopa.rtd.ms.pieventprocessor.configuration.CommonConsumerConfiguration;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.CardChangeType;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.TokenManagerCardChanged;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -34,7 +34,7 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@SpringBootTest(classes = {CommonConsumerConfig.class})
+@SpringBootTest(classes = {CommonConsumerConfiguration.class})
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EmbeddedKafka(topics = {"${topics.rtd-slit-by-pi.topic}"}, partitions = 2, bootstrapServersProperty = "spring.embedded.kafka.brokers")

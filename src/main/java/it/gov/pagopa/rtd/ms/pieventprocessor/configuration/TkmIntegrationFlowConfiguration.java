@@ -31,7 +31,7 @@ import java.util.function.Function;
 
 @Configuration
 @EnableConfigurationProperties
-public class TkmIntegrationFlowConfig {
+public class TkmIntegrationFlowConfiguration {
 
     private static final String TARGET_OUT_BINDING = "rtdSplitByPi-out-0";
 
