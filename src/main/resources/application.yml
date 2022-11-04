@@ -5,19 +5,19 @@ logging:
 ## Topics and consumer groups
 topics:
   rtd-slit-by-pi:
-    topic: ${KAFKA_RTD_SPLIT_BY_PI:rtd-split-by-pi}
-  rtd-pi-from-app:
-    topic: ${KAFKA_RTD_PI_FROM_APP:rtd-pi-from-app}
-    group: ${KAFKA_RTD_PI_FROM_APP_CONSUMER_GROUP:rtd-enrolled-payment-instrument-consumer-group}
+    topic: ${KAFKA_RTD_SPLIT_TOPIC:rtd-split-by-pi}
+#  rtd-pi-from-app:
+#    topic: ${KAFKA_RTD_PI_FROM_APP:rtd-pi-from-app}
+#    group: ${KAFKA_RTD_PI_FROM_APP_CONSUMER_GROUP:rtd-enrolled-payment-instrument-consumer-group}
   tkm-write-update:
-    topic: ${KAFKA_TOPIC_TKM_BROKER:tkm-write-update-token}
+    topic: ${KAFKA_TOPIC_TKM:tkm-write-update-token}
     group: ${KAFKA_TOPIC_TKM_CONSUMER_GROUP:rtd-pim-consumer-group}
 
 # custom integration flow properties
 integration-flow-consumers:
   tkmBulkConsumer:
     topic: ${topics.tkm-write-update.topic}
-    bootstrap.servers: ${KAFKA_BROKER_TKM:localhost:29095}
+    bootstrap.servers: ${KAFKA_TOPIC_TKM_BROKER:localhost:29095}
     group.id: ${topics.tkm-write-update.group}
     key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
     value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -32,6 +32,7 @@ spring:
   config:
     activate:
       on-profile: default
+
 
   cloud:
     stream:
@@ -67,17 +68,17 @@ spring:
           environment.spring.cloud.stream.kafka:
             binder:
               auto-create-topics: false
-              brokers: ${KAFKA_RTD_SPLIT_BY_PI_BROKER:localhost:29095}
+              brokers: ${KAFKA_RTD_SPLIT_BROKER:localhost:29095}
               sync: true
               requiredAcks: all
               configuration:
-                sasl.jaas.config: ${KAFKA_RTD_SPLIT_BY_PI_SASL_JAAS_CONFIG}
+                sasl.jaas.config: ${KAFKA_RTD_SPLIT_SASL_JAAS_CONFIG}
         kafka-tkm-test:
           type: kafka
           environment.spring.cloud.stream.kafka:
             binder:
-              auto-create-topics: true
-              brokers: ${KAFKA_BROKER_TKM:localhost:29095}
+              auto-create-topics: false
+              brokers: ${KAFKA_TOPIC_TKM_BROKER:localhost:29095}
               sync: true
               requiredAcks: all
               configuration:
