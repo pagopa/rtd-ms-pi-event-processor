@@ -21,6 +21,7 @@
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.source>11</maven.compiler.source>
 		<spring-cloud.version>2021.0.4</spring-cloud.version>
+		<sonar.exclusions>**/*Configuration.java,**/*Application.java,**/ports/rest/**/*</sonar.exclusions>
 	</properties>
 
 	<dependencies>
