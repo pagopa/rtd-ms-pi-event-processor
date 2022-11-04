@@ -67,13 +67,13 @@ class TokenManagerWalletEventSplitterTest {
     // assert over hash tokens
     assertThat(cardEvents)
             .allMatch(it -> cards.stream().anyMatch(that ->
-                    that.hpan().equals(it.getHashPan()) && that.par().equals(it.getPar()) &&
-                            that.action() == it.getChangeType()
+                    that.getHpan().equals(it.getHashPan()) && that.getPar().equals(it.getPar()) &&
+                            that.getAction() == it.getChangeType()
             ))
             .flatMap(TokenManagerCardChanged::getHashTokens)
             .isNotEmpty()
             .allMatch(it -> hashTokens.stream().anyMatch(that ->
-                    it.getHashToken().equals(that.htoken()) && it.getChangeType() == that.haction()
+                    it.getHashToken().equals(that.getHtoken()) && it.getChangeType() == that.getHaction()
             ));
   }
 

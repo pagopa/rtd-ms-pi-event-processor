@@ -40,6 +40,6 @@ public final class TestUtils {
                         generateRandomHashPanAsString(),
                         random.nextDouble() < 0.5 ? HashTokenChangeType.DELETE : HashTokenChangeType.INSERT_UPDATE
                 ))
-                .toList();
+                .collect(Collectors.toList());
     }
 }
