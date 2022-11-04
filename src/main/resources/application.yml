@@ -11,7 +11,7 @@ topics:
     group: ${KAFKA_RTD_PI_FROM_APP_CONSUMER_GROUP:rtd-enrolled-payment-instrument-consumer-group}
   tkm-write-update:
     topic: ${KAFKA_TOPIC_TKM_BROKER:tkm-write-update-token}
-    group: rtd-pim-consumer-group
+    group: ${KAFKA_TOPIC_TKM_CONSUMER_GROUP:rtd-pim-consumer-group}
 
 # custom integration flow properties
 integration-flow-consumers:
