@@ -18,6 +18,15 @@ spec:
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: rtd-ms-pi-event-processor
+            - secretRef:
+                name: rtd-pi-from-app-consumer
+            - secretRef:
+                name: rtd-tkm-write-update-consumer
+            - secretRef:
+                name: rtd-split-by-pi-producer
           resources:
             limits:
               cpu: 500m

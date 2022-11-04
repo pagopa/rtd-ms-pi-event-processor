@@ -1,0 +1,85 @@
+logging:
+  level:
+    root: INFO
+
+## Topics and consumer groups
+topics:
+  rtd-slit-by-pi:
+    topic: ${KAFKA_RTD_SPLIT_BY_PI:rtd-split-by-pi}
+  rtd-pi-from-app:
+    topic: ${KAFKA_RTD_PI_FROM_APP:rtd-pi-from-app}
+    group: ${KAFKA_RTD_PI_FROM_APP_CONSUMER_GROUP:rtd-enrolled-payment-instrument-consumer-group}
+  tkm-write-update:
+    topic: ${KAFKA_TOPIC_TKM_BROKER:tkm-write-update-token}
+    group: ${KAFKA_TOPIC_TKM_CONSUMER_GROUP:rtd-pim-consumer-group}
+
+# custom integration flow properties
+integration-flow-consumers:
+  tkmBulkConsumer:
+    topic: ${topics.tkm-write-update.topic}
+    bootstrap.servers: ${KAFKA_BROKER_TKM:localhost:29095}
+    group.id: ${topics.tkm-write-update.group}
+    key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    allow.auto.create.topics: false
+    max.poll.records: 1
+    sasl.jaas.config: ${KAFKA_SASL_JAAS_CONFIG_TKM_PIM}
+    sasl.mechanism: PLAIN
+    security.protocol: SASL_SSL
+
+
+spring:
+  config:
+    activate:
+      on-profile: default
+
+  cloud:
+    stream:
+      function:
+        autodetect: false
+
+      kafka:
+        binder:
+          configuration:
+            security.protocol: SASL_SSL
+            sasl.mechanism: PLAIN
+
+      bindings:
+        rtdSplitByPi-out-0:
+          destination: ${topics.rtd-slit-by-pi.topic}
+          content-type: application/json
+          binder: kafka-split-by-binder
+          producer:
+            partitionKeyExpression: headers.partitionKey
+            partitionCount: ${KAFKA_PARTITION_COUNT:1}
+            sync: true
+
+        tkmWalletTestProducer-out-0:
+          destination: ${topics.tkm-write-update.topic}
+          content-type: application/json
+          binder: kafka-tkm-test
+          producer:
+            partitionCount: 1
+
+      binders:
+        kafka-split-by-binder:
+          type: kafka
+          environment.spring.cloud.stream.kafka:
+            binder:
+              auto-create-topics: false
+              brokers: ${KAFKA_RTD_SPLIT_BY_PI_BROKER:localhost:29095}
+              sync: true
+              requiredAcks: all
+              configuration:
+                sasl.jaas.config: ${KAFKA_RTD_SPLIT_BY_PI_SASL_JAAS_CONFIG}
+        kafka-tkm-test:
+          type: kafka
+          environment.spring.cloud.stream.kafka:
+            binder:
+              auto-create-topics: true
+              brokers: ${KAFKA_BROKER_TKM:localhost:29095}
+              sync: true
+              requiredAcks: all
+              configuration:
+                sasl.jaas.config: ${KAFKA_SASL_JAAS_CONFIG_TKM_PIM}
+
