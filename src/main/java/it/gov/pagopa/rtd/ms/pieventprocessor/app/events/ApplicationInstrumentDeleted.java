@@ -1,23 +1,18 @@
 package it.gov.pagopa.rtd.ms.pieventprocessor.app.events;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Data
-public class ApplicationInstrumentDeleted implements ApplicationInstrumentEvent {
+@EqualsAndHashCode(callSuper = true)
+public final class ApplicationInstrumentDeleted extends ApplicationInstrumentEvent {
 
   public static final String TYPE = "ApplicationInstrumentDeleted";
 
-  private final String hashPan;
-  private final boolean allowTokenized;
-  private final String application;
+  public ApplicationInstrumentDeleted(String hashPan, boolean allowTokenized, String application) {
+    super(hashPan, allowTokenized, application);
+  }
 
   @Override
   public String cloudEventType() {
     return TYPE;
-  }
-
-  @Override
-  public String hashPan() {
-    return hashPan;
   }
 }

@@ -97,7 +97,7 @@ class ApplicationInstrumentEventPublisherTest {
       assertThat(records).map(it -> objectMapper.readValue(it.value(), cloudEventType))
               .allMatch(it -> Objects.equals(it.getType(), ApplicationInstrumentAdded.TYPE))
               .allMatch(it -> Objects.isNull(it.getData()))
-              .allMatch(it -> Objects.equals(it.getData().hashPan(), hashPan));
+              .allMatch(it -> Objects.equals(it.getData().getHashPan(), hashPan));
     });
   }
 
@@ -112,7 +112,7 @@ class ApplicationInstrumentEventPublisherTest {
       assertThat(records).map(it -> objectMapper.readValue(it.value(), cloudEventType))
               .allMatch(it -> Objects.equals(it.getType(), ApplicationInstrumentAdded.TYPE))
               .allMatch(it -> Objects.isNull(it.getData()))
-              .allMatch(it -> Objects.equals(it.getData().hashPan(), hashPan));
+              .allMatch(it -> Objects.equals(it.getData().getHashPan(), hashPan));
     });
   }
 }

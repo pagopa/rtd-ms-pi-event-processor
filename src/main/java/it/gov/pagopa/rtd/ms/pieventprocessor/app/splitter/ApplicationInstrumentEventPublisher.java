@@ -21,7 +21,7 @@ public class ApplicationInstrumentEventPublisher implements GenericHandler<Appli
   public boolean publish(ApplicationInstrumentEvent instrumentEvent) {
     final var cloudEvent = CloudEvent.of(instrumentEvent);
     return bridge.send(outputBindingName, MessageBuilder.withPayload(cloudEvent)
-            .setHeader("partitionKey", instrumentEvent.hashPan()).build());
+            .setHeader("partitionKey", instrumentEvent.getHashPan()).build());
   }
 
   @Override

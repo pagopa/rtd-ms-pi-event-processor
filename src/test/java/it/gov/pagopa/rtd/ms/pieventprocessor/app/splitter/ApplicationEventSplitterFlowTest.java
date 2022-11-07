@@ -50,7 +50,7 @@ import static org.mockito.ArgumentMatchers.any;
 @TestPropertySource("classpath:application-test.yml")
 @ExtendWith(MockitoExtension.class)
 @Import(ApplicationEventSplitterFlowTest.Config.class)
-public class ApplicationEventSplitterFlowTest {
+class ApplicationEventSplitterFlowTest {
 
   @Value("${topics.rtd-pi-from-app.topic}")
   private String topic;
