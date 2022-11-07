@@ -12,7 +12,7 @@ public class ApplicationInstrumentAdded implements ApplicationInstrumentEvent {
   private final String application;
 
   @Override
-  public String type() {
+  public String cloudEventType() {
     return TYPE;
   }
 

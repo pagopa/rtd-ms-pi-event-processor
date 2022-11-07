@@ -6,7 +6,7 @@ import lombok.Data;
 public class CloudEvent<T> {
 
   public static <T extends CloudEventType> CloudEvent<T> of(T event) {
-    return new CloudEvent<>(event.type(), event);
+    return new CloudEvent<>(event.cloudEventType(), event);
   }
 
   private final String type;
