@@ -1,5 +1,6 @@
 package it.gov.pagopa.rtd.ms.pieventprocessor.ports.rest;
 
+import it.gov.pagopa.rtd.ms.pieventprocessor.app.events.ApplicationBulkEvent;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.TokenManagerCardChanged;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.TokenManagerWalletChanged;
 import org.springframework.http.HttpStatus;
@@ -17,8 +18,7 @@ public interface KafkaRestController {
   @ResponseStatus(HttpStatus.OK)
   void sendTkmUpdateEvent(@RequestBody TokenManagerWalletChanged event);
 
-  @PutMapping(value = "/tkm-update")
+  @PutMapping(value = "/rtd-pi-from-app")
   @ResponseStatus(HttpStatus.OK)
-  void sendTkmCardChangedEvent(@RequestBody TokenManagerCardChanged event);
-
+  void sendApplicationInstrumentBulkEvent(@RequestBody ApplicationBulkEvent event);
 }
