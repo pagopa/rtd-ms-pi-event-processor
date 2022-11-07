@@ -52,6 +52,7 @@ class ApplicationInstrumentEventPublisherTest {
 
   @Autowired
   private StreamBridge bridge;
+
   private ApplicationInstrumentEventPublisher instrumentEventPublisher;
 
   private Consumer<String, String> consumer;

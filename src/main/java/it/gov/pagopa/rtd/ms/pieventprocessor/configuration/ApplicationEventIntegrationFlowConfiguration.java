@@ -15,9 +15,8 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.handler.advice.RequestHandlerRetryAdvice;
 import org.springframework.integration.handler.advice.RetryStateGenerator;
 import org.springframework.integration.handler.advice.SpelExpressionRetryStateGenerator;
-import org.springframework.integration.kafka.dsl.Kafka;
-import org.springframework.integration.kafka.inbound.KafkaMessageDrivenChannelAdapter;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.AbstractMessageListenerContainer;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DefaultErrorHandler;
@@ -36,7 +35,7 @@ public class ApplicationEventIntegrationFlowConfiguration {
 
     @Bean("applicationSplitterFlow")
     public IntegrationFlow applicationEventSplitterFlow(
-            KafkaMessageDrivenChannelAdapter<String, ApplicationBulkEvent> applicationBulkEventInput,
+            AbstractMessageListenerContainer<String, ApplicationBulkEvent> applicationBulkEventInput,
             Function<ApplicationBulkEvent, List<ApplicationInstrumentEvent>> applicationSplitter,
             ApplicationInstrumentEventPublisher applicationInstrumentEventPublisher,
             RequestHandlerRetryAdvice applicationRetryAdvice
@@ -57,7 +56,7 @@ public class ApplicationEventIntegrationFlowConfiguration {
     }
 
     @Bean
-    KafkaMessageDrivenChannelAdapter<String, ApplicationBulkEvent> applicationBulkEventInput(
+    AbstractMessageListenerContainer<String, ApplicationBulkEvent> applicationBulkEventContainer(
             IntegrationFlowKafkaProperties flowKafkaProperties,
             DefaultErrorHandler consumerErrorHandler
     ) {
@@ -68,9 +67,7 @@ public class ApplicationEventIntegrationFlowConfiguration {
         containerProperties.setAckMode(ContainerProperties.AckMode.RECORD);
         final var container = new ConcurrentMessageListenerContainer<>(consumerFactory, containerProperties);
         container.setCommonErrorHandler(consumerErrorHandler);
-        return Kafka.messageDrivenChannelAdapter(container, KafkaMessageDrivenChannelAdapter.ListenerMode.record)
-                .id("applicationBulkEventInput")
-                .get();
+        return container;
     }
 
 

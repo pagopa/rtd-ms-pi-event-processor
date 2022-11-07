@@ -147,6 +147,6 @@ class TokenManagerWalletEventTkmSplitterFlowTest {
     private IntegrationFlow applicationSplitterFlow;
 
     @MockBean
-    private KafkaMessageDrivenChannelAdapter<String, ApplicationBulkEvent> applicationBulkEventInput;
+    private AbstractMessageListenerContainer<String, ApplicationBulkEvent> applicationBulkEventContainer;
   }
 }
