@@ -27,7 +27,7 @@ variables:
   settingsXmlSecureFileName: '$(SETTINGS_XML_RO_SECURE_FILE_NAME)'
 
   # If the branch is develop or a feature branch starting with CEN, deploy in DEV environment
-  ${{ if or(startsWith(variables['Build.SourceBranch'], 'refs/heads/develop'), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/TAE'), startsWith(variables['Build.SourceBranch'], 'refs/heads/RTD')) ) }}:
+  ${{ if or(startsWith(variables['Build.SourceBranch'], 'refs/heads/develop'), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/fix'), startsWith(variables['Build.SourceBranch'], 'refs/heads/RTD')) ) }}:
     environment: 'DEV'
     isToDeploy: true
     dockerRegistryServiceConnection: '$(DEV_CONTAINER_REGISTRY_SERVICE_CONN)'
