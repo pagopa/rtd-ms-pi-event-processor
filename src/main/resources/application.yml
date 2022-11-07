@@ -6,9 +6,9 @@ logging:
 topics:
   rtd-slit-by-pi:
     topic: ${KAFKA_RTD_SPLIT_TOPIC:rtd-split-by-pi}
-#  rtd-pi-from-app:
-#    topic: ${KAFKA_RTD_PI_FROM_APP:rtd-pi-from-app}
-#    group: ${KAFKA_RTD_PI_FROM_APP_CONSUMER_GROUP:rtd-enrolled-payment-instrument-consumer-group}
+  rtd-pi-from-app:
+    topic: ${KAFKA_RTD_PI_FROM_APP:rtd-pi-from-app}
+    group: ${KAFKA_RTD_PI_FROM_APP_CONSUMER_GROUP:rtd-enrolled-payment-instrument-consumer-group}
   tkm-write-update:
     topic: ${KAFKA_TOPIC_TKM:tkm-write-update-token}
     group: ${KAFKA_TOPIC_TKM_CONSUMER_GROUP:rtd-pim-consumer-group}
@@ -27,6 +27,17 @@ integration-flow-consumers:
     sasl.mechanism: PLAIN
     security.protocol: SASL_SSL
 
+  applicationBulkConsumer:
+    topic: ${topics.rtd-pi-from-app.topic}
+    bootstrap.servers: ${KAFKA_RTD_PI_FROM_APP_BROKER:localhost:29095}
+    group.id: ${topics.rtd-pi-from-app.group}
+    key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    allow.auto.create.topics: false
+    max.poll.records: 1
+    sasl.jaas.config: ${KAFKA_RTD_PI_FROM_APP_SASL_JAAS_CONFIG}
+    sasl.mechanism: PLAIN
+    security.protocol: SASL_SSL
 
 spring:
   config:
