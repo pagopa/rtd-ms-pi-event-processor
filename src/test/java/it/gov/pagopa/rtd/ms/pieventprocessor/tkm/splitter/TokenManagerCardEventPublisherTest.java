@@ -1,7 +1,9 @@
 package it.gov.pagopa.rtd.ms.pieventprocessor.tkm.splitter;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.rtd.ms.pieventprocessor.TestUtils;
+import it.gov.pagopa.rtd.ms.pieventprocessor.common.cloudevent.CloudEvent;
 import it.gov.pagopa.rtd.ms.pieventprocessor.configuration.CommonConsumerConfiguration;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.CardChangeType;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.TokenManagerCardChanged;
@@ -84,6 +86,7 @@ class TokenManagerCardEventPublisherTest {
 
   @Test
   void whenPublishCardChangedEventThenMustHaveSamePayload() {
+    final var cloudEventType = new TypeReference<CloudEvent<TokenManagerCardChanged>>(){};
     final var events = IntStream.range(0, 10)
             .mapToObj(i -> TestUtils.prepareRandomTokenManagerEvent(CardChangeType.INSERT_UPDATE).build())
             .collect(Collectors.toList());
@@ -92,8 +95,8 @@ class TokenManagerCardEventPublisherTest {
 
     await().ignoreException(NoSuchElementException.class).atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
       final var records = consumer.poll(Duration.ZERO);
-      assertThat(records).map(it -> objectMapper.readValue(it.value(), TokenManagerCardChanged.class))
-              .hasSameElementsAs(events);
+      assertThat(records).map(it -> objectMapper.readValue(it.value(), cloudEventType))
+              .hasSameElementsAs(events.stream().map(CloudEvent::of).collect(Collectors.toList()));
     });
   }
 }

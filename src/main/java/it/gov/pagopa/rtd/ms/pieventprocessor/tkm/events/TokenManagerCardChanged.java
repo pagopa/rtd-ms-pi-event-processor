@@ -1,5 +1,6 @@
 package it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events;
 
+import it.gov.pagopa.rtd.ms.pieventprocessor.common.cloudevent.CloudEventType;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -12,7 +13,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public final class TokenManagerCardChanged {
+public final class TokenManagerCardChanged implements CloudEventType {
+
+  public static final String TYPE = "TokenManagerCardChanged";
 
   @NotNull
   @NotBlank
@@ -28,6 +31,11 @@ public final class TokenManagerCardChanged {
 
   @NotNull
   private CardChangeType changeType;
+
+  @Override
+  public String cloudEventType() {
+    return TYPE;
+  }
 
   @Data
   @NoArgsConstructor
