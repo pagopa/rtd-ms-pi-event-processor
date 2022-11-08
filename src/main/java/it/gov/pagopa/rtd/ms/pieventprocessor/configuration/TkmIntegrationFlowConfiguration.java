@@ -16,9 +16,8 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.handler.advice.RequestHandlerRetryAdvice;
 import org.springframework.integration.handler.advice.RetryStateGenerator;
 import org.springframework.integration.handler.advice.SpelExpressionRetryStateGenerator;
-import org.springframework.integration.kafka.dsl.Kafka;
-import org.springframework.integration.kafka.inbound.KafkaMessageDrivenChannelAdapter;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.AbstractMessageListenerContainer;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DefaultErrorHandler;
@@ -37,7 +36,7 @@ public class TkmIntegrationFlowConfiguration {
 
     @Bean
     public IntegrationFlow tkmSplitterFlow(
-            KafkaMessageDrivenChannelAdapter<String, TokenManagerWalletChanged> tkmBulkInput,
+            AbstractMessageListenerContainer<String, TokenManagerWalletChanged> tkmBulkInput,
             Function<TokenManagerWalletChanged, List<TokenManagerCardChanged>> tkmSplitter,
             RequestHandlerRetryAdvice tkmRetryAdvice,
             TokenManagerCardEventHandler cardEventHandler
@@ -61,7 +60,7 @@ public class TkmIntegrationFlowConfiguration {
     }
 
     @Bean
-    KafkaMessageDrivenChannelAdapter<String, TokenManagerWalletChanged> tkmBulkInput(
+    ConcurrentMessageListenerContainer<String, TokenManagerWalletChanged> tkmBulkInput(
             IntegrationFlowKafkaProperties flowKafkaProperties,
             DefaultErrorHandler consumerErrorHandler
     ) {
@@ -72,7 +71,7 @@ public class TkmIntegrationFlowConfiguration {
         containerProperties.setAckMode(ContainerProperties.AckMode.RECORD);
         final var container = new ConcurrentMessageListenerContainer<>(consumerFactory, containerProperties);
         container.setCommonErrorHandler(consumerErrorHandler);
-        return Kafka.messageDrivenChannelAdapter(container, KafkaMessageDrivenChannelAdapter.ListenerMode.record).get();
+        return container;
     }
 
 

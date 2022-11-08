@@ -24,6 +24,16 @@ integration-flow-consumers:
     allow.auto.create.topics: false
     max.poll.records: 1
 
+  applicationBulkConsumer:
+    topic: ${topics.rtd-pi-from-app.topic}
+    bootstrap.servers: ${spring.embedded.kafka.brokers}
+    group.id: ${topics.rtd-pi-from-app.group}
+    key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    allow.auto.create.topics: false
+    max.poll.records: 1
+
+
 spring:
   config:
     activate:
@@ -31,6 +41,8 @@ spring:
 
   cloud:
     stream:
+      function:
+        autodetect: false
       bindings:
         rtdSplitByPi-out-0:
           destination: ${topics.rtd-slit-by-pi.topic}
