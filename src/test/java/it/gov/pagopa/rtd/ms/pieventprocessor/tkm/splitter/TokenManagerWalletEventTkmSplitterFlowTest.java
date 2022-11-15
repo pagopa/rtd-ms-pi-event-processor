@@ -1,5 +1,6 @@
 package it.gov.pagopa.rtd.ms.pieventprocessor.tkm.splitter;
 
+import it.gov.pagopa.rtd.ms.pieventprocessor.app.events.ApplicationBulkEvent;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.CardChangeType;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.TokenManagerCardChanged;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.TokenManagerWalletChanged;
@@ -17,13 +18,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.kafka.inbound.KafkaMessageDrivenChannelAdapter;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.AbstractMessageListenerContainer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -45,15 +52,19 @@ import static org.mockito.ArgumentMatchers.any;
 @EnableAutoConfiguration(exclude = {TestSupportBinderAutoConfiguration.class})
 @TestPropertySource("classpath:application-test.yml")
 @ExtendWith(MockitoExtension.class)
+@Import(TokenManagerWalletEventTkmSplitterFlowTest.Config.class)
 class TokenManagerWalletEventTkmSplitterFlowTest {
 
   @Value("${topics.tkm-write-update.topic}")
   private String topic;
 
-  @MockBean
+  @Autowired
+  private AbstractMessageListenerContainer<String, TokenManagerWalletChanged> tkmBulkInput;
+
+  @Autowired
   private Function<TokenManagerWalletChanged, List<TokenManagerCardChanged>> splitter;
 
-  @MockBean
+  @Autowired
   private TokenManagerCardEventPublisher cardEventPublisher;
 
   private KafkaTemplate<String, TokenManagerWalletChanged> kafkaTemplate;
@@ -63,6 +74,7 @@ class TokenManagerWalletEventTkmSplitterFlowTest {
     kafkaTemplate = new KafkaTemplate<>(
             new DefaultKafkaProducerFactory<>(KafkaTestUtils.producerProps(broker), new StringSerializer(), new JsonSerializer<>())
     );
+    ContainerTestUtils.waitForAssignment(tkmBulkInput, broker.getPartitionsPerTopic());
   }
 
   @AfterEach
@@ -121,5 +133,20 @@ class TokenManagerWalletEventTkmSplitterFlowTest {
       Mockito.verify(cardEventPublisher, Mockito.times(2)).sendTokenManagerCardChanged(captor.capture());
       assertThat(captor.getAllValues()).hasSize(2);
     });
+  }
+
+  @TestConfiguration
+  static class Config {
+    @MockBean
+    private Function<TokenManagerWalletChanged, List<TokenManagerCardChanged>> splitter;
+
+    @MockBean
+    private TokenManagerCardEventPublisher cardEventPublisher;
+
+    @MockBean(name = "applicationSplitterFlow")
+    private IntegrationFlow applicationSplitterFlow;
+
+    @MockBean
+    private AbstractMessageListenerContainer<String, ApplicationBulkEvent> applicationBulkEventContainer;
   }
 }

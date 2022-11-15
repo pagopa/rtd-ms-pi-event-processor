@@ -5,9 +5,11 @@ import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.TokenManagerWalletChange
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.splitter.TokenManagerCardEventHandler;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.endpoint.MessageProducerSupport;
 import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.integration.handler.advice.RequestHandlerRetryAdvice;
+import org.springframework.integration.kafka.dsl.Kafka;
+import org.springframework.integration.kafka.inbound.KafkaMessageDrivenChannelAdapter;
+import org.springframework.kafka.listener.AbstractMessageListenerContainer;
 
 import java.util.List;
 import java.util.function.Function;
@@ -17,12 +19,13 @@ public final class TkmSplitterFlow {
   private TkmSplitterFlow() {}
 
   public static IntegrationFlow createFlow(
-          MessageProducerSupport tkmBulkInput,
+          AbstractMessageListenerContainer<String, TokenManagerWalletChanged> tkmBulkInput,
           Function<TokenManagerWalletChanged, List<TokenManagerCardChanged>> tkmSplitter,
           RequestHandlerRetryAdvice tkmRetryAdvice,
           TokenManagerCardEventHandler cardEventHandler
   ) {
-    return IntegrationFlows.from(tkmBulkInput)
+    final var input = Kafka.messageDrivenChannelAdapter(tkmBulkInput, KafkaMessageDrivenChannelAdapter.ListenerMode.record).get();
+    return IntegrationFlows.from(input)
             .log(LoggingHandler.Level.INFO, m -> "Received message to split: " + m.getPayload())
             .split(TokenManagerWalletChanged.class, tkmSplitter)
             .log(LoggingHandler.Level.INFO, m -> "Split message " + m.getPayload())

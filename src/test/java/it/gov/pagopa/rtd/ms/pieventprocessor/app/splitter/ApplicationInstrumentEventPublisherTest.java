@@ -1,12 +1,12 @@
-package it.gov.pagopa.rtd.ms.pieventprocessor.tkm.splitter;
+package it.gov.pagopa.rtd.ms.pieventprocessor.app.splitter;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.rtd.ms.pieventprocessor.TestUtils;
+import it.gov.pagopa.rtd.ms.pieventprocessor.app.events.ApplicationInstrumentAdded;
+import it.gov.pagopa.rtd.ms.pieventprocessor.app.events.ApplicationInstrumentDeleted;
 import it.gov.pagopa.rtd.ms.pieventprocessor.common.cloudevent.CloudEvent;
 import it.gov.pagopa.rtd.ms.pieventprocessor.configuration.CommonConsumerConfiguration;
-import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.CardChangeType;
-import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.TokenManagerCardChanged;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +30,7 @@ import org.springframework.test.context.TestPropertySource;
 import java.time.Duration;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +43,8 @@ import static org.awaitility.Awaitility.await;
 @EnableAutoConfiguration(exclude = {TestSupportBinderAutoConfiguration.class})
 @TestPropertySource("classpath:application-test.yml")
 @ExtendWith(MockitoExtension.class)
-class TokenManagerCardEventPublisherTest {
+class ApplicationInstrumentEventPublisherTest {
+
   private static final String OUT_BINDING = "rtdSplitByPi-out-0";
 
   @Value("${topics.rtd-slit-by-pi.topic}")
@@ -51,7 +52,8 @@ class TokenManagerCardEventPublisherTest {
 
   @Autowired
   private StreamBridge bridge;
-  private TokenManagerCardEventPublisher cardEventPublisher;
+
+  private ApplicationInstrumentEventPublisher instrumentEventPublisher;
 
   private Consumer<String, String> consumer;
   private ObjectMapper objectMapper;
@@ -61,7 +63,7 @@ class TokenManagerCardEventPublisherTest {
     final var consumerProperties = KafkaTestUtils.consumerProps("group", "true", broker);
     consumer = new DefaultKafkaConsumerFactory<String, String>(consumerProperties).createConsumer();
     consumer.subscribe(List.of(topic));
-    cardEventPublisher = new TokenManagerCardEventPublisher(OUT_BINDING, bridge);
+    instrumentEventPublisher = new ApplicationInstrumentEventPublisher(OUT_BINDING, bridge);
     objectMapper = new ObjectMapper();
   }
 
@@ -71,11 +73,11 @@ class TokenManagerCardEventPublisherTest {
   }
 
   @Test
-  void whenPublishCardChangedEventThenShouldBeProducedOnDifferentPartitions() {
+  void whenPublishApplicationInstrumentEventThenShouldBeProducedOnDifferentPartitions() {
     final var events = IntStream.range(0, 10)
-            .mapToObj(i -> TestUtils.prepareRandomTokenManagerEvent(CardChangeType.INSERT_UPDATE).build());
+            .mapToObj(i -> TestUtils.randomApplicationInstrumentEvent());
 
-    events.forEach(it -> cardEventPublisher.sendTokenManagerCardChanged(it));
+    events.forEach(it -> instrumentEventPublisher.publish(it));
 
     await().ignoreException(NoSuchElementException.class).atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
       final var records = consumer.poll(Duration.ZERO);
@@ -85,18 +87,32 @@ class TokenManagerCardEventPublisherTest {
   }
 
   @Test
-  void whenPublishCardChangedEventThenMustHaveSamePayload() {
-    final var cloudEventType = new TypeReference<CloudEvent<TokenManagerCardChanged>>(){};
-    final var events = IntStream.range(0, 10)
-            .mapToObj(i -> TestUtils.prepareRandomTokenManagerEvent(CardChangeType.INSERT_UPDATE).build())
-            .collect(Collectors.toList());
-
-    events.forEach(it -> cardEventPublisher.sendTokenManagerCardChanged(it));
-
+  void whenPublishApplicationInstrumentAddedThenRightCloudEventMustBeProduced() {
+    final var cloudEventType = new TypeReference<CloudEvent<ApplicationInstrumentAdded>>(){};
+    final var hashPan = TestUtils.generateRandomHashPanAsString();
+    final var event = new ApplicationInstrumentAdded(hashPan, true, "ID_PAY");
+    instrumentEventPublisher.publish(event);
     await().ignoreException(NoSuchElementException.class).atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
       final var records = consumer.poll(Duration.ZERO);
       assertThat(records).map(it -> objectMapper.readValue(it.value(), cloudEventType))
-              .hasSameElementsAs(events.stream().map(CloudEvent::of).collect(Collectors.toList()));
+              .allMatch(it -> Objects.equals(it.getType(), ApplicationInstrumentAdded.TYPE))
+              .allMatch(it -> Objects.isNull(it.getData()))
+              .allMatch(it -> Objects.equals(it.getData().getHashPan(), hashPan));
+    });
+  }
+
+  @Test
+  void whenPublishApplicationInstrumentDeletedThenRightCloudEventMustBeProduced() {
+    final var cloudEventType = new TypeReference<CloudEvent<ApplicationInstrumentDeleted>>(){};
+    final var hashPan = TestUtils.generateRandomHashPanAsString();
+    final var event = new ApplicationInstrumentDeleted(hashPan, true, "ID_PAY");
+    instrumentEventPublisher.publish(event);
+    await().ignoreException(NoSuchElementException.class).atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
+      final var records = consumer.poll(Duration.ZERO);
+      assertThat(records).map(it -> objectMapper.readValue(it.value(), cloudEventType))
+              .allMatch(it -> Objects.equals(it.getType(), ApplicationInstrumentAdded.TYPE))
+              .allMatch(it -> Objects.isNull(it.getData()))
+              .allMatch(it -> Objects.equals(it.getData().getHashPan(), hashPan));
     });
   }
 }

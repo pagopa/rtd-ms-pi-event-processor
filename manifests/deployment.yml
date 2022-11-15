@@ -27,6 +27,8 @@ spec:
                 name: rtd-tkm-write-update-consumer
             - secretRef:
                 name: rtd-split-by-pi-producer
+            - secretRef:
+                name: application-insights
           resources:
             limits:
               cpu: 500m
