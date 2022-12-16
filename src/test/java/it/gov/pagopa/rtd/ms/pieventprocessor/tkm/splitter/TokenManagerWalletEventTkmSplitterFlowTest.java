@@ -23,7 +23,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.kafka.inbound.KafkaMessageDrivenChannelAdapter;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer;
@@ -37,7 +36,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.function.Function;
 
@@ -88,10 +87,10 @@ class TokenManagerWalletEventTkmSplitterFlowTest {
     Mockito.doReturn(false).when(cardEventPublisher).sendTokenManagerCardChanged(any());
 
     Mockito.doReturn(List.of(
-            new TokenManagerCardChanged("hpan", "taxCode", "par", List.of(), LocalDateTime.now(), CardChangeType.INSERT_UPDATE))
+            new TokenManagerCardChanged("hpan", "taxCode", "par", List.of(), OffsetDateTime.now(), CardChangeType.INSERT_UPDATE))
     ).when(splitter).apply(any());
 
-    final var walletChanged = new TokenManagerWalletChanged("taxCode", LocalDateTime.now(), List.of(
+    final var walletChanged = new TokenManagerWalletChanged("taxCode", OffsetDateTime.now(), List.of(
             new TokenManagerWalletChanged.CardItem("hpan", "par", CardChangeType.INSERT_UPDATE, null)
     ));
 
@@ -105,7 +104,7 @@ class TokenManagerWalletEventTkmSplitterFlowTest {
   @ParameterizedTest
   @ValueSource(classes = {IllegalArgumentException.class})
   void whenFailToSplitDueToInvalidPayloadThenNoRetryHappens(Class<? extends Exception> exception) {
-    final var walletChanged = new TokenManagerWalletChanged("taxCode", LocalDateTime.now(), List.of(
+    final var walletChanged = new TokenManagerWalletChanged("taxCode", OffsetDateTime.now(), List.of(
             new TokenManagerWalletChanged.CardItem("hpan", "par", CardChangeType.INSERT_UPDATE, null)
     ));
 
@@ -119,10 +118,10 @@ class TokenManagerWalletEventTkmSplitterFlowTest {
   @Test
   void whenReceiveWalletChangeEventThenSplitAndPublish() {
     final ArgumentCaptor<TokenManagerCardChanged> captor = ArgumentCaptor.forClass(TokenManagerCardChanged.class);
-    final var walletChanged = new TokenManagerWalletChanged("taxCode", LocalDateTime.now(), List.of());
+    final var walletChanged = new TokenManagerWalletChanged("taxCode", OffsetDateTime.now(), List.of());
     Mockito.doReturn(List.of(
-            new TokenManagerCardChanged("hpan", "taxCode", "par", List.of(), LocalDateTime.now(), CardChangeType.INSERT_UPDATE),
-            new TokenManagerCardChanged("hpan2", "taxCode", "par2", List.of(), LocalDateTime.now(), CardChangeType.INSERT_UPDATE))
+            new TokenManagerCardChanged("hpan", "taxCode", "par", List.of(), OffsetDateTime.now(), CardChangeType.INSERT_UPDATE),
+            new TokenManagerCardChanged("hpan2", "taxCode", "par2", List.of(), OffsetDateTime.now(), CardChangeType.INSERT_UPDATE))
     ).when(splitter).apply(any());
 
 
