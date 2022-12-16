@@ -8,7 +8,7 @@ import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.TokenManagerWalletChange
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -37,7 +37,7 @@ class TokenManagerWalletEventSplitterTest {
             )
     ).collect(Collectors.toList());
 
-    final var walletEvent = new TokenManagerWalletChanged("taxCode", LocalDateTime.now(), cards);
+    final var walletEvent = new TokenManagerWalletChanged("taxCode", OffsetDateTime.now(), cards);
     final var cardEvents = splitter.apply(walletEvent);
 
     assertThat(cardEvents)
@@ -61,7 +61,7 @@ class TokenManagerWalletEventSplitterTest {
             )
     ).collect(Collectors.toList());
 
-    final var walletEvent = new TokenManagerWalletChanged("taxCode", LocalDateTime.now(), cards);
+    final var walletEvent = new TokenManagerWalletChanged("taxCode", OffsetDateTime.now(), cards);
     final var cardEvents = splitter.apply(walletEvent);
 
     // assert over hash tokens
@@ -80,7 +80,7 @@ class TokenManagerWalletEventSplitterTest {
   @Test
   void whenWalletCardsHaveNullTokensThenCardEventHaveNoTokens() {
     final var events = splitter.apply(
-            new TokenManagerWalletChanged("taxCode", LocalDateTime.now(),
+            new TokenManagerWalletChanged("taxCode", OffsetDateTime.now(),
                     List.of(
                             new TokenManagerWalletChanged.CardItem(
                                     "hpan",
@@ -98,7 +98,7 @@ class TokenManagerWalletEventSplitterTest {
   @Test
   void whenWalletHasNullCardThenSplitIntoEmptyList() {
     final var cardEvents = splitter.apply(
-            new TokenManagerWalletChanged("taxCode", LocalDateTime.now(), null)
+            new TokenManagerWalletChanged("taxCode", OffsetDateTime.now(), null)
     );
     assertThat(cardEvents).isEmpty();
   }

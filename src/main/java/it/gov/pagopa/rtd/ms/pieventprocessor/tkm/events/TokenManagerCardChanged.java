@@ -2,10 +2,11 @@ package it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events;
 
 import it.gov.pagopa.rtd.ms.pieventprocessor.common.cloudevent.CloudEventType;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Data
@@ -27,7 +28,8 @@ public final class TokenManagerCardChanged implements CloudEventType {
 
   private List<HashTokenEvent> hashTokens;
 
-  private LocalDateTime timestamp;
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private OffsetDateTime timestamp;
 
   @NotNull
   private CardChangeType changeType;
