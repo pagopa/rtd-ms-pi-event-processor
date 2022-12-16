@@ -1,5 +1,8 @@
 package it.gov.pagopa.rtd.ms.pieventprocessor;
 
+import it.gov.pagopa.rtd.ms.pieventprocessor.app.events.ApplicationInstrumentAdded;
+import it.gov.pagopa.rtd.ms.pieventprocessor.app.events.ApplicationInstrumentDeleted;
+import it.gov.pagopa.rtd.ms.pieventprocessor.app.events.ApplicationInstrumentEvent;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.CardChangeType;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.HashTokenChangeType;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.TokenManagerCardChanged;
@@ -31,6 +34,12 @@ public final class TestUtils {
                 .taxCode(randomString(10))
                 .hashTokens(generateRandomHashTokenEvent(10))
                 .changeType(action);
+    }
+
+    public static ApplicationInstrumentEvent randomApplicationInstrumentEvent() {
+        return random.nextDouble() >= 0.5 ?
+                new ApplicationInstrumentAdded(generateRandomHashPanAsString(), true, randomString(5)) :
+                new ApplicationInstrumentDeleted(generateRandomHashPanAsString(), true, randomString(5));
     }
 
     public static List<TokenManagerCardChanged.HashTokenEvent> generateRandomHashTokenEvent(int which) {

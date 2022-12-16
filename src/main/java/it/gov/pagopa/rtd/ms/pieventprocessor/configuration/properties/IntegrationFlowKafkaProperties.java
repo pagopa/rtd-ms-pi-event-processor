@@ -11,4 +11,5 @@ import java.util.Map;
 @Data
 public final class IntegrationFlowKafkaProperties {
   public final Map<String, String> tkmBulkConsumer;
+  public final Map<String, String> applicationBulkConsumer;
 }
