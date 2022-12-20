@@ -1,12 +1,21 @@
 package it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -21,8 +30,8 @@ import java.util.List;
 public final class TokenManagerWalletChanged {
 
   private String taxCode;
-  @JsonFormat(pattern =  "yyyy-MM-dd HH:mm:ss:SSSS")
-  private LocalDateTime timestamp;
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private OffsetDateTime timestamp;
   private List<CardItem> cards;
 
   @Data
