@@ -1,6 +1,7 @@
 logging:
   level:
     root: INFO
+    org.apache.kafka: WARN
 
 ## Topics and consumer groups
 topics:
