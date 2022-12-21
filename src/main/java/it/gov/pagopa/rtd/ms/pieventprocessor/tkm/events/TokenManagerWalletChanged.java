@@ -49,8 +49,8 @@ public final class TokenManagerWalletChanged {
 
   public static class TkmDateDeserializer extends JsonDeserializer<OffsetDateTime> {
 
-    static final DateTimeFormatter TKM_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSSS");
-    static final ZoneId EUROPE_ROME_ZONE = ZoneId.of("Europe/Rome");
+    public static final DateTimeFormatter TKM_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSSS");
+    public static final ZoneId EUROPE_ROME_ZONE = ZoneId.of("Europe/Rome");
 
     @Override
     public OffsetDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
