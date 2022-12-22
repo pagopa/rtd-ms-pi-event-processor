@@ -1,6 +1,5 @@
 package it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -9,11 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -30,7 +29,7 @@ import java.util.List;
 public final class TokenManagerWalletChanged {
 
   private String taxCode;
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  @JsonDeserialize(using = TkmDateDeserializer.class)
   private OffsetDateTime timestamp;
   private List<CardItem> cards;
 
@@ -46,5 +45,24 @@ public final class TokenManagerWalletChanged {
   public static final class HashTokenItem {
     private final String htoken;
     private final HashTokenChangeType haction;
+  }
+
+  public static class TkmDateDeserializer extends JsonDeserializer<OffsetDateTime> {
+
+    public static final DateTimeFormatter TKM_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSSS");
+    public static final ZoneId EUROPE_ROME_ZONE = ZoneId.of("Europe/Rome");
+
+    @Override
+    public OffsetDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+      final var dateTime = jsonParser.readValueAs(String.class);
+      try {
+        return OffsetDateTime.parse(dateTime);
+      } catch (Exception e) {
+        return LocalDateTime.parse(dateTime, TKM_DATE_FORMAT)
+                .atZone(EUROPE_ROME_ZONE)
+                .toOffsetDateTime()
+                .withOffsetSameInstant(ZoneOffset.UTC);
+      }
+    }
   }
 }
