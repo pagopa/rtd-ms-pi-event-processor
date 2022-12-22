@@ -7,15 +7,6 @@ parameters:
     type: boolean
     default: true
 
-  - name: ENV
-    displayName: K8S cluster ENV
-    type: string
-    default: DEV
-    values:
-      - DEV
-      - UAT
-      - PROD
-
 trigger:
   branches:
     include:
@@ -44,14 +35,14 @@ variables:
   canDeploy: true
 
   # If the branch is develop or a feature branch starting with CEN, deploy in DEV environment
-  ${{ if or(startsWith(variables['Build.SourceBranch'], 'refs/heads/develop'), eq(parameters.ENV, 'DEV')) }}:
+  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/develop') }}:
     environment: 'DEV'
     dockerRegistryServiceConnection: '$(DEV_CONTAINER_REGISTRY_SERVICE_CONN)'
     kubernetesServiceConnection: '$(DEV_KUBERNETES_SERVICE_CONN)'
     containerRegistry: '$(DEV_CONTAINER_REGISTRY_NAME)'
     selfHostedAgentPool: $(DEV_AGENT_POOL)
 
-  ${{ elseif or(startsWith(variables['Build.SourceBranch'], 'refs/heads/uat'), eq(parameters.ENV, 'UAT')) }}:
+  ${{ elseif startsWith(variables['Build.SourceBranch'], 'refs/heads/uat') }}:
     environment: 'UAT'
     dockerRegistryServiceConnection: '$(UAT_CONTAINER_REGISTRY_SERVICE_CONN)'
     kubernetesServiceConnection: '$(UAT_KUBERNETES_SERVICE_CONN)'
