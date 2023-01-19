@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public class ApplicationBulkEventSplitter implements Function<ApplicationBulkEvent, List<ApplicationInstrumentEvent>> {
   @Override
   public List<ApplicationInstrumentEvent> apply(ApplicationBulkEvent applicationBulkEvent) {
+    System.out.println("Should trigger code review");
     return Optional.ofNullable(applicationBulkEvent.getHashPans())
             .orElse(Collections.emptyList())
             .stream()
