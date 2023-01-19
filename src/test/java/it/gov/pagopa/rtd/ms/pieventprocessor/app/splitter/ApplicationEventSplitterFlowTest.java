@@ -80,17 +80,18 @@ class ApplicationEventSplitterFlowTest {
 
   @Test
   void whenFailToPublishSplitEventsThenRetryWholeSplitting() {
-    Mockito.doReturn(false).when(instrumentEventPublisher).publish(Mockito.any());
+    Mockito.doReturn(false).when(instrumentEventPublisher).publish(Mockito.any(), any());
     final var applicationBulkEvent = new ApplicationBulkEvent(
             "ID_PAY",
             ApplicationBulkEvent.Operation.ADD_INSTRUMENT,
-            List.of(new ApplicationBulkEvent.HashPanConsentItem(TestUtils.generateRandomHashPanAsString(), true))
+            List.of(new ApplicationBulkEvent.HashPanConsentItem(TestUtils.generateRandomHashPanAsString(), true)),
+            null
     );
 
     kafkaTemplate.send(topic, applicationBulkEvent);
 
     await().atMost(Duration.ofSeconds(15)).untilAsserted(() -> {
-      Mockito.verify(instrumentEventPublisher, Mockito.atLeast(3)).publish(any());
+      Mockito.verify(instrumentEventPublisher, Mockito.atLeast(3)).publish(any(), any());
     });
   }
 
@@ -101,15 +102,16 @@ class ApplicationEventSplitterFlowTest {
             "ID_PAY",
             ApplicationBulkEvent.Operation.ADD_INSTRUMENT,
             List.of(new ApplicationBulkEvent.HashPanConsentItem(TestUtils.generateRandomHashPanAsString(), true),
-                    new ApplicationBulkEvent.HashPanConsentItem(TestUtils.generateRandomHashPanAsString(), true))
+                    new ApplicationBulkEvent.HashPanConsentItem(TestUtils.generateRandomHashPanAsString(), true)),
+            null
     );
 
 
-    Mockito.doReturn(true).when(instrumentEventPublisher).publish(any());
+    Mockito.doReturn(true).when(instrumentEventPublisher).publish(any(), any());
     kafkaTemplate.send(topic, applicationBulkEvent);
 
     await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
-      Mockito.verify(instrumentEventPublisher, Mockito.times(2)).publish(captor.capture());
+      Mockito.verify(instrumentEventPublisher, Mockito.times(2)).publish(captor.capture(), any());
       assertThat(captor.getAllValues()).hasSize(2);
     });
   }

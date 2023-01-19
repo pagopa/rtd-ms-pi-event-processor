@@ -46,6 +46,7 @@ import static org.awaitility.Awaitility.await;
 class ApplicationInstrumentEventPublisherTest {
 
   private static final String OUT_BINDING = "rtdSplitByPi-out-0";
+  private static final String CORRELATION_HEADER = "requestId";
 
   @Value("${topics.rtd-slit-by-pi.topic}")
   private String topic;
@@ -63,7 +64,7 @@ class ApplicationInstrumentEventPublisherTest {
     final var consumerProperties = KafkaTestUtils.consumerProps("group", "true", broker);
     consumer = new DefaultKafkaConsumerFactory<String, String>(consumerProperties).createConsumer();
     consumer.subscribe(List.of(topic));
-    instrumentEventPublisher = new ApplicationInstrumentEventPublisher(OUT_BINDING, bridge);
+    instrumentEventPublisher = new ApplicationInstrumentEventPublisher(OUT_BINDING, bridge, CORRELATION_HEADER);
     objectMapper = new ObjectMapper();
   }
 
@@ -77,7 +78,7 @@ class ApplicationInstrumentEventPublisherTest {
     final var events = IntStream.range(0, 10)
             .mapToObj(i -> TestUtils.randomApplicationInstrumentEvent());
 
-    events.forEach(it -> instrumentEventPublisher.publish(it));
+    events.forEach(it -> instrumentEventPublisher.publish(it, null));
 
     await().ignoreException(NoSuchElementException.class).atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
       final var records = consumer.poll(Duration.ZERO);
@@ -91,13 +92,14 @@ class ApplicationInstrumentEventPublisherTest {
     final var cloudEventType = new TypeReference<CloudEvent<ApplicationInstrumentAdded>>(){};
     final var hashPan = TestUtils.generateRandomHashPanAsString();
     final var event = new ApplicationInstrumentAdded(hashPan, true, "ID_PAY");
-    instrumentEventPublisher.publish(event);
+    instrumentEventPublisher.publish(event, "1234");
     await().ignoreException(NoSuchElementException.class).atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
       final var records = consumer.poll(Duration.ZERO);
       assertThat(records).map(it -> objectMapper.readValue(it.value(), cloudEventType))
               .allMatch(it -> Objects.equals(it.getType(), ApplicationInstrumentAdded.TYPE))
               .allMatch(it -> Objects.isNull(it.getData()))
-              .allMatch(it -> Objects.equals(it.getData().getHashPan(), hashPan));
+              .allMatch(it -> Objects.equals(it.getData().getHashPan(), hashPan))
+              .allMatch(it -> Objects.equals(it.getCorrelationId(), "1234"));
     });
   }
 
@@ -106,13 +108,14 @@ class ApplicationInstrumentEventPublisherTest {
     final var cloudEventType = new TypeReference<CloudEvent<ApplicationInstrumentDeleted>>(){};
     final var hashPan = TestUtils.generateRandomHashPanAsString();
     final var event = new ApplicationInstrumentDeleted(hashPan, true, "ID_PAY");
-    instrumentEventPublisher.publish(event);
+    instrumentEventPublisher.publish(event, null);
     await().ignoreException(NoSuchElementException.class).atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
       final var records = consumer.poll(Duration.ZERO);
       assertThat(records).map(it -> objectMapper.readValue(it.value(), cloudEventType))
               .allMatch(it -> Objects.equals(it.getType(), ApplicationInstrumentAdded.TYPE))
               .allMatch(it -> Objects.isNull(it.getData()))
-              .allMatch(it -> Objects.equals(it.getData().getHashPan(), hashPan));
+              .allMatch(it -> Objects.equals(it.getData().getHashPan(), hashPan))
+              .allMatch(it -> Objects.isNull(it.getCorrelationId()));
     });
   }
 }

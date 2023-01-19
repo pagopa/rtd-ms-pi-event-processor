@@ -34,7 +34,8 @@ class ApplicationBulkEventSplitterTest {
             List.of(
                     new ApplicationBulkEvent.HashPanConsentItem(TestUtils.generateRandomHashPanAsString(), true),
                     new ApplicationBulkEvent.HashPanConsentItem(TestUtils.generateRandomHashPanAsString(), false)
-            )
+            ),
+            null
     );
 
     final var events = splitter.apply(bulkEvent);
@@ -53,7 +54,8 @@ class ApplicationBulkEventSplitterTest {
             List.of(
                     new ApplicationBulkEvent.HashPanConsentItem(TestUtils.generateRandomHashPanAsString(), true),
                     new ApplicationBulkEvent.HashPanConsentItem(TestUtils.generateRandomHashPanAsString(), false)
-            )
+            ),
+            null
     );
 
     final var events = splitter.apply(bulkEvent);
@@ -68,7 +70,7 @@ class ApplicationBulkEventSplitterTest {
   @Test
   void whenBulkHasNullHashPanListThenSplitIntoEmptyList() {
     final var cardEvents = splitter.apply(
-            new ApplicationBulkEvent("ID_PAY", ApplicationBulkEvent.Operation.ADD_INSTRUMENT, null)
+            new ApplicationBulkEvent("ID_PAY", ApplicationBulkEvent.Operation.ADD_INSTRUMENT, null, null)
     );
     assertThat(cardEvents).isEmpty();
   }
