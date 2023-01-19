@@ -16,7 +16,8 @@ public class ApplicationBulkEventSplitter implements Function<ApplicationBulkEve
   public List<ApplicationInstrumentEvent> apply(ApplicationBulkEvent applicationBulkEvent) {
     return Optional.ofNullable(applicationBulkEvent.getHashPans())
             .orElse(Collections.emptyList())
-            .stream().map(it -> mapToInstrumentEvent(applicationBulkEvent.getOperationType(), applicationBulkEvent.getApplication(), it))
+            .stream()
+            .map(it -> mapToInstrumentEvent(applicationBulkEvent.getOperationType(), applicationBulkEvent.getApplication(), it))
             .collect(Collectors.toList());
   }
 

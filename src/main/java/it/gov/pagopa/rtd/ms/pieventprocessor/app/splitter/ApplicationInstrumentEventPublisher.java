@@ -12,24 +12,26 @@ public class ApplicationInstrumentEventPublisher implements GenericHandler<Appli
 
   private final String outputBindingName;
   private final StreamBridge bridge;
+  private final String headerRequestId;
 
-  public ApplicationInstrumentEventPublisher(String outputBindingName, StreamBridge bridge) {
+  public ApplicationInstrumentEventPublisher(String outputBindingName, StreamBridge bridge, String headerRequestId) {
     this.outputBindingName = outputBindingName;
     this.bridge = bridge;
-  }
-
-  public boolean publish(ApplicationInstrumentEvent instrumentEvent) {
-    final var cloudEvent = CloudEvent.of(instrumentEvent);
-    return bridge.send(outputBindingName, MessageBuilder.withPayload(cloudEvent)
-            .setHeader("partitionKey", instrumentEvent.getHashPan()).build());
+    this.headerRequestId = headerRequestId;
   }
 
   @Override
   public Object handle(ApplicationInstrumentEvent payload, MessageHeaders headers) {
-    if (this.publish(payload)) {
+    if (this.publish(payload, headers.get(headerRequestId, String.class))) {
       return null;
     } else {
       throw new FailToPublishException("Fail to send application instrument event " + payload);
     }
+  }
+
+  boolean publish(ApplicationInstrumentEvent instrumentEvent, String correlationId) {
+    final var cloudEvent = CloudEvent.of(instrumentEvent, correlationId);
+    return bridge.send(outputBindingName, MessageBuilder.withPayload(cloudEvent)
+            .setHeader("partitionKey", instrumentEvent.getHashPan()).build());
   }
 }
