@@ -32,6 +32,7 @@ import java.util.function.Function;
 public class ApplicationEventIntegrationFlowConfiguration {
 
     private static final String TARGET_OUT_BINDING = "rtdSplitByPi-out-0";
+    private static final String ENRICH_HEADER_REQUEST_ID = "requestId";
 
     @Bean("applicationSplitterFlow")
     public IntegrationFlow applicationEventSplitterFlow(
@@ -41,7 +42,11 @@ public class ApplicationEventIntegrationFlowConfiguration {
             RequestHandlerRetryAdvice applicationRetryAdvice
     ) {
         return ApplicationInstrumentSplitterFlow.createFlow(
-                applicationBulkEventInput, applicationSplitter, applicationInstrumentEventPublisher, applicationRetryAdvice
+                applicationBulkEventInput,
+                applicationSplitter,
+                applicationInstrumentEventPublisher,
+                applicationRetryAdvice,
+                ENRICH_HEADER_REQUEST_ID
         );
     }
 
@@ -52,7 +57,7 @@ public class ApplicationEventIntegrationFlowConfiguration {
 
     @Bean
     ApplicationInstrumentEventPublisher applicationInstrumentEventPublisher(StreamBridge bridge) {
-        return new ApplicationInstrumentEventPublisher(TARGET_OUT_BINDING, bridge);
+        return new ApplicationInstrumentEventPublisher(TARGET_OUT_BINDING, bridge, ENRICH_HEADER_REQUEST_ID);
     }
 
     @Bean

@@ -5,6 +5,7 @@ import it.gov.pagopa.rtd.ms.pieventprocessor.app.events.ApplicationInstrumentEve
 import it.gov.pagopa.rtd.ms.pieventprocessor.app.splitter.ApplicationInstrumentEventPublisher;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.dsl.Transformers;
 import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.integration.handler.advice.RequestHandlerRetryAdvice;
 import org.springframework.integration.kafka.dsl.Kafka;
@@ -23,13 +24,16 @@ public class ApplicationInstrumentSplitterFlow {
           AbstractMessageListenerContainer<String, ApplicationBulkEvent> applicationBulkEventInput,
           Function<ApplicationBulkEvent, List<ApplicationInstrumentEvent>> splitter,
           ApplicationInstrumentEventPublisher publisher,
-          RequestHandlerRetryAdvice retryAdvice
+          RequestHandlerRetryAdvice retryAdvice,
+          String enrichRequestIdHeader
   ) {
     return IntegrationFlows.from(Kafka.messageDrivenChannelAdapter(
                     applicationBulkEventInput,
                     KafkaMessageDrivenChannelAdapter.ListenerMode.record
             ).id("applicationBulkEventInput").get())
             .log(LoggingHandler.Level.INFO, m -> "Received message to split: " + m.getPayload())
+            .transform(Transformers.fromJson(ApplicationBulkEvent.class))
+            .enrich(enricher -> enricher.<ApplicationBulkEvent>headerFunction(enrichRequestIdHeader, m -> m.getPayload().getCorrelationId()))
             .split(ApplicationBulkEvent.class, splitter)
             .log(LoggingHandler.Level.INFO, m -> "Split message " + m.getPayload())
             .handle(ApplicationInstrumentEvent.class, publisher, e -> e.advice(retryAdvice))

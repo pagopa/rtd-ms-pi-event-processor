@@ -30,15 +30,20 @@ public final class ApplicationBulkEvent {
   @JsonProperty(required = true)
   private List<HashPanConsentItem> hashPans;
 
+  @NotBlank
+  private String correlationId;
+
   public enum Operation {
     ADD_INSTRUMENT,
     DELETE_INSTRUMENT
   }
 
   @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
   public static final class HashPanConsentItem {
     @JsonAlias("hpan")
-    private final String hashPan;
-    private final boolean consent;
+    private String hashPan;
+    private boolean consent;
   }
 }

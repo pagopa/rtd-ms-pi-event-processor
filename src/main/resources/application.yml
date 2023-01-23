@@ -3,6 +3,16 @@ logging:
     root: INFO
     org.apache.kafka: WARN
 
+management:
+  metrics.export.defaults.enabled: false
+  info.defaults.enabled: false
+  endpoints.enabled-by-default: false
+  endpoint:
+    health:
+      enabled: true
+      probes:
+        enabled: true
+
 ## Topics and consumer groups
 topics:
   rtd-slit-by-pi:
