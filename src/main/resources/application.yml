@@ -73,7 +73,7 @@ spring:
           binder: kafka-split-by-binder
           producer:
             partitionKeyExpression: headers.partitionKey
-            partitionCount: ${KAFKA_PARTITION_COUNT:1}
+            partitionCount: ${KAFKA_RTD_SPLIT_PARTITION_COUNT:1}
             sync: true
 
         tkmWalletTestProducer-out-0:
