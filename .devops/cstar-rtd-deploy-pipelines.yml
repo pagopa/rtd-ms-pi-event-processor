@@ -12,7 +12,7 @@ trigger:
     include:
       - develop
       - uat
-#      - main
+      - main
   paths:
     include:
       - src/*
@@ -49,12 +49,12 @@ variables:
     containerRegistry: '$(UAT_CONTAINER_REGISTRY_NAME)'
     selfHostedAgentPool: $(UAT_AGENT_POOL)
 
-#  ${{ elseif or(startsWith(variables['Build.SourceBranch'], 'refs/heads/main'), eq(parameters.ENV, 'PROD')) }}:
-#    environment: 'PROD'
-#    dockerRegistryServiceConnection: '$(PROD_CONTAINER_REGISTRY_SERVICE_CONN)'
-#    kubernetesServiceConnection: '$(PROD_KUBERNETES_SERVICE_CONN)'
-#    containerRegistry: '$(PROD_CONTAINER_REGISTRY_NAME)'
-#    selfHostedAgentPool: $(PROD_AGENT_POOL)
+  ${{ elseif or(startsWith(variables['Build.SourceBranch'], 'refs/heads/main'), eq(parameters.ENV, 'PROD')) }}:
+    environment: 'PROD'
+    dockerRegistryServiceConnection: '$(PROD_CONTAINER_REGISTRY_SERVICE_CONN)'
+    kubernetesServiceConnection: '$(PROD_KUBERNETES_SERVICE_CONN)'
+    containerRegistry: '$(PROD_CONTAINER_REGISTRY_NAME)'
+    selfHostedAgentPool: $(PROD_AGENT_POOL)
 
   ${{ else }}:
     environment: 'DEV'
