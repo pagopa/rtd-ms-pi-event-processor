@@ -49,7 +49,7 @@ variables:
     containerRegistry: '$(UAT_CONTAINER_REGISTRY_NAME)'
     selfHostedAgentPool: $(UAT_AGENT_POOL)
 
-  ${{ elseif or(startsWith(variables['Build.SourceBranch'], 'refs/heads/main'), eq(parameters.ENV, 'PROD')) }}:
+  ${{ elseif startsWith(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     environment: 'PROD'
     dockerRegistryServiceConnection: '$(PROD_CONTAINER_REGISTRY_SERVICE_CONN)'
     kubernetesServiceConnection: '$(PROD_KUBERNETES_SERVICE_CONN)'
