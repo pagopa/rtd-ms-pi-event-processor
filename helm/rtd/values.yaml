@@ -47,6 +47,9 @@ microservice-chart:
   securityContext:
     allowPrivilegeEscalation: false
 
+  envConfig:
+    APPLICATIONINSIGHTS_PREVIEW_PROFILER_ENABLED: "false"
+
   envSecret:
     KAFKA_SASL_JAAS_CONFIG_TKM_PIM: evh-tkm-write-update-token-tkm-write-update-token-sub-key
     KAFKA_RTD_PI_FROM_APP_SASL_JAAS_CONFIG: evh-rtd-pi-from-app-rtd-pi-from-app-consumer-policy-rtd
