@@ -2,7 +2,7 @@ package it.gov.pagopa.rtd.ms.pieventprocessor.tkm.splitter;
 
 import it.gov.pagopa.rtd.ms.pieventprocessor.common.errors.FailToPublishException;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.TokenManagerCardChanged;
-import org.springframework.integration.handler.GenericHandler;
+import org.springframework.integration.core.GenericHandler;
 import org.springframework.messaging.MessageHeaders;
 
 public class TokenManagerCardEventHandler implements GenericHandler<TokenManagerCardChanged> {

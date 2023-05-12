@@ -7,7 +7,7 @@ import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.backoff.FixedBackOff;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
