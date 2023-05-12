@@ -22,7 +22,6 @@
 		<maven.compiler.source>17</maven.compiler.source>
 		<spring-cloud.version>2022.0.2</spring-cloud.version>
 		<snakeyaml.version>2.0</snakeyaml.version>
-		<testcontainers.version>1.18.0</testcontainers.version>
 		<sonar.exclusions>**/*Configuration.java,**/*Application.java,**/ports/rest/**/*</sonar.exclusions>
 	</properties>
 
