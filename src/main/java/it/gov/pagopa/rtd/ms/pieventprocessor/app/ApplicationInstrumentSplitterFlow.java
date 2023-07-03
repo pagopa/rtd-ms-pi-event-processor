@@ -3,17 +3,15 @@ package it.gov.pagopa.rtd.ms.pieventprocessor.app;
 import it.gov.pagopa.rtd.ms.pieventprocessor.app.events.ApplicationBulkEvent;
 import it.gov.pagopa.rtd.ms.pieventprocessor.app.events.ApplicationInstrumentEvent;
 import it.gov.pagopa.rtd.ms.pieventprocessor.app.splitter.ApplicationInstrumentEventPublisher;
+import java.util.List;
+import java.util.function.Function;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.Transformers;
 import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.integration.handler.advice.RequestHandlerRetryAdvice;
 import org.springframework.integration.kafka.dsl.Kafka;
 import org.springframework.integration.kafka.inbound.KafkaMessageDrivenChannelAdapter;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer;
-
-import java.util.List;
-import java.util.function.Function;
 
 public class ApplicationInstrumentSplitterFlow {
 
@@ -27,7 +25,7 @@ public class ApplicationInstrumentSplitterFlow {
           RequestHandlerRetryAdvice retryAdvice,
           String enrichRequestIdHeader
   ) {
-    return IntegrationFlows.from(Kafka.messageDrivenChannelAdapter(
+    return IntegrationFlow.from(Kafka.messageDrivenChannelAdapter(
                     applicationBulkEventInput,
                     KafkaMessageDrivenChannelAdapter.ListenerMode.record
             ).id("applicationBulkEventInput").get())
