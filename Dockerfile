@@ -5,7 +5,7 @@ COPY . .
 
 RUN mvn clean package
 
-FROM amazoncorretto:amazoncorretto:17.0.8-alpine3.18@sha256:0c61f12abfb091be48474e836e6802ff3a93e8e038e0460af8c7f447ccbd3901 AS runtime
+FROM amazoncorretto:17.0.8-alpine3.18@sha256:0c61f12abfb091be48474e836e6802ff3a93e8e038e0460af8c7f447ccbd3901 AS runtime
 
 # operation needed because amazoncorretto do not contain the shadow-utils package
 RUN yum install -y /usr/sbin/adduser
