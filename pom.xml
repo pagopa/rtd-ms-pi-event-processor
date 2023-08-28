@@ -20,7 +20,7 @@
 		<java.version>17</java.version>
 		<maven.compiler.target>17</maven.compiler.target>
 		<maven.compiler.source>17</maven.compiler.source>
-		<spring-cloud.version>2022.0.4</spring-cloud.version>
+		<spring-cloud.version>2022.0.3</spring-cloud.version>
 		<snakeyaml.version>2.1</snakeyaml.version>
 		<kafka.version>3.5.1</kafka.version>
 		<sonar.exclusions>**/*Configuration.java,**/*Application.java,**/ports/rest/**/*</sonar.exclusions>
