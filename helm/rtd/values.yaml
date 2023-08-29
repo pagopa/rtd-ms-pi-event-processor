@@ -56,7 +56,6 @@ microservice-chart:
     APPLICATIONINSIGHTS_PREVIEW_PROFILER_ENABLED: "false"
 
   envSecret:
-    KAFKA_SASL_JAAS_CONFIG_TKM_PIM: evh-tkm-write-update-token-tkm-write-update-token-sub-key
     KAFKA_RTD_PI_FROM_APP_SASL_JAAS_CONFIG: evh-rtd-pi-from-app-rtd-pi-from-app-consumer-policy-rtd
     KAFKA_RTD_SPLIT_SASL_JAAS_CONFIG: evh-rtd-split-by-pi-rtd-split-by-pi-producer-policy-rtd
     APPLICATIONINSIGHTS_CONNECTION_STRING: appinsights-instrumentation-key
@@ -77,8 +76,3 @@ microservice-chart:
       KAFKA_RTD_SPLIT_TOPIC: KAFKA_RTD_SPLIT_TOPIC
       KAFKA_RTD_SPLIT_BROKER: KAFKA_RTD_SPLIT_BROKER
       KAFKA_RTD_SPLIT_PARTITION_COUNT: KAFKA_RTD_SPLIT_PARTITION_COUNT
-
-    rtd-tkm-write-update-consumer:
-      KAFKA_TOPIC_TKM: KAFKA_TOPIC_TKM
-      KAFKA_TOPIC_TKM_CONSUMER_GROUP: KAFKA_TOPIC_TKM_CONSUMER_GROUP
-      KAFKA_TOPIC_TKM_BROKER: KAFKA_TOPIC_TKM_BROKER

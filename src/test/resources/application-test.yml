@@ -16,6 +16,7 @@ topics:
 # custom integration flow properties
 integration-flow-consumers:
   tkmBulkConsumer:
+    enabled: true
     topic: ${topics.tkm-write-update.topic}
     bootstrap.servers: ${spring.embedded.kafka.brokers}
     group.id: ${topics.tkm-write-update.group}

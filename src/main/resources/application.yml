@@ -27,6 +27,7 @@ topics:
 # custom integration flow properties
 integration-flow-consumers:
   tkmBulkConsumer:
+    enabled: false
     topic: ${topics.tkm-write-update.topic}
     bootstrap.servers: ${KAFKA_TOPIC_TKM_BROKER:localhost:29095}
     group.id: ${topics.tkm-write-update.group}
