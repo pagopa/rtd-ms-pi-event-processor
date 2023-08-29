@@ -7,6 +7,7 @@ import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.events.TokenManagerWalletChange
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.splitter.TokenManagerCardEventHandler;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.splitter.TokenManagerCardEventPublisher;
 import it.gov.pagopa.rtd.ms.pieventprocessor.tkm.splitter.TokenManagerWalletEventSplitter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.classify.BinaryExceptionClassifier;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -30,6 +31,7 @@ import java.util.function.Function;
 
 @Configuration
 @EnableConfigurationProperties
+@ConditionalOnProperty(value = "integration-flow-consumers.tkmBulkConsumer.enabled", matchIfMissing = false)
 public class TkmIntegrationFlowConfiguration {
 
     private static final String TARGET_OUT_BINDING = "rtdSplitByPi-out-0";
